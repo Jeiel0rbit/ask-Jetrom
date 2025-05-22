@@ -10,11 +10,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
+REDIS_URL = os.getenv("REDIS_URL")
+limiter_storage_uri = REDIS_URL if REDIS_URL else "memory://"
+
 limiter = Limiter(
     get_remote_address,
     app=app,
     default_limits=["200 per day", "10 per hour"],
-    storage_uri="memory://",
+    storage_uri=limiter_storage_uri,
 )
 
 try:
