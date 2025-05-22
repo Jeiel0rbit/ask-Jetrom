@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia da API Gemini Flask</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1, h2, h3 { color: #333; }
+        code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        pre { background-color: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .container { max-width: 800px; margin: auto; }
+        .note { background-color: #e7f3fe; border-left: 6px solid #2196F3; padding: 10px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Guia da API Gemini com Flask</h1>
+        <p>Esta é uma API simples construída com Flask para interagir com a API Gemini do Google.</p>
+
+        <div class="note">
+            <p><strong>Modelo Gemini Configurado no Servidor:</strong> <code>{{ model_name }}</code></p>
+            <p>Para alterar o modelo, o desenvolvedor precisa modificar a variável <code>MODEL_NAME</code> no arquivo <code>app.py</code> do servidor e reiniciar a aplicação.</p>
+        </div>
+
+        <h2>Endpoint: <code>/generate</code></h2>
+        <ul>
+            <li><strong>Método:</strong> <code>POST</code></li>
+            <li><strong>URL:</strong> <code>http://SEU_IP_OU_DOMINIO:PORTA/generate</code> (ex: <code>http://127.0.0.1:5000/generate</code>)</li>
+            <li><strong>Corpo da Requisição (Payload):</strong> JSON contendo um campo "prompt".
+                <pre><code>{
+    "prompt": "O texto do seu prompt aqui..."
+}</code></pre>
+            </li>
+        </ul>
+
+        <h2>Formato da Resposta</h2>
+        <p>A API retorna uma resposta em formato JSON.</p>
+        <h3>Em caso de sucesso:</h3>
+        <pre><code>{
+    "generated_text": "Texto gerado pelo modelo Gemini..."
+}</code></pre>
+        <h3>Em caso de erro:</h3>
+        <pre><code>{
+    "error": "Descrição do erro...",
+    "details": "Detalhes adicionais do erro (opcional)..."
+}</code></pre>
+
+        <h2>Como Usar (Exemplos)</h2>
+
+        <h3>1. Usando <code>curl</code> (Linha de Comando)</h3>
+        <p>Certifique-se de que o servidor Flask esteja rodando.</p>
+        <h4>Para Windows (CMD):</h4>
+        <pre><code>curl -X POST -H "Content-Type: application/json" -d "{\"prompt\": \"Escreva uma piada sobre IA.\"}" http://127.0.0.1:5000/generate</code></pre>
+        <h4>Para Linux/macOS:</h4>
+        <pre><code>curl -X POST -H "Content-Type: application/json" \
+-d '{"prompt": "Escreva uma piada sobre IA."}' \
+http://127.0.0.1:5000/generate</code></pre>
+
+        <h3>2. Usando JavaScript (<code>fetch</code> API no Navegador)</h3>
+        <pre><code>async function gerarTextoComGemini(meuPrompt) {
+    const apiUrl = "/generate"; // Ou a URL completa se estiver chamando de outro domínio/porta
+    
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: meuPrompt })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro da API: ${response.status} - ${errorData.error || 'Erro desconhecido'}`);
+        }
+
+        const data = await response.json();
+        console.log("Texto Gerado:", data.generated_text);
+        return data.generated_text;
+    } catch (error) {
+        console.error("Falha ao chamar a API:", error);
+    }
+}
+
+// Exemplo de uso:
+// gerarTextoComGemini("Qual a previsão do tempo para amanhã em Ananindeua?");</code></pre>
+
+        <h3>3. Usando Python (<code>requests</code>)</h3>
+        <p>Primeiro, instale a biblioteca se ainda não tiver: <code>pip install requests</code></p>
+        <pre><code>import requests
+import json
+
+def chamar_api_gemini_flask(prompt_usuario):
+    api_url = "http://127.0.0.1:5000/generate"
+    payload = {"prompt": prompt_usuario}
+    headers = {"Content-Type": "application/json"}
+
+    try:
+        response = requests.post(api_url, data=json.dumps(payload), headers=headers)
+        response.raise_for_status() # Lança uma exceção para respostas de erro (4xx ou 5xx)
+        
+        resultado = response.json()
+        texto_gerado = resultado.get("generated_text")
+
+        if texto_gerado:
+            print("Resposta da API Gemini (via Flask):")
+            print(texto_gerado)
+        elif "error" in resultado:
+            print(f"Erro da API: {resultado.get('error')}")
+            if "details" in resultado:
+                print(f"Detalhes: {resultado.get('details')}")
+        else:
+            print(f"Resposta inesperada da API: {resultado}")
+        
+        return texto_gerado
+
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao conectar com a API Flask: {e}")
+    except json.JSONDecodeError:
+        print(f"Erro ao decodificar a resposta JSON da API Flask. Resposta recebida: {response.text}")
+    
+    return None
+
+# Exemplo de uso:
+# chamar_api_gemini_flask("Conte uma curiosidade sobre o universo.")</code></pre>
+    </div>
+</body>
+</html>
