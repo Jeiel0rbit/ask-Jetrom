@@ -5,6 +5,7 @@ import json
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_cors import cross_origin
 
 load_dotenv()
 
@@ -45,6 +46,7 @@ def home():
     return render_template('index.html', model_name=MODEL_NAME)
 
 @app.route('/generate', methods=['POST'])
+@cross_origin()  # Permite qualquer origem, até o momento.
 @limiter.limit("10/hour") 
 def generate_text():
     if not request.is_json:
