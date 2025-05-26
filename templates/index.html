@@ -40,7 +40,7 @@
         <h2>Endpoint: <code>/generate</code></h2>
         <p>Este é o coração da API. É aqui que a mágica acontece.</p>
         <ul>
-            <li><strong>URL:</strong> <code>[URL_BASE_DO_SEU_SERVIDOR]/generate</code></li>
+            <li><strong>URL:</strong> <code>https://ask-jetrom.vercel.app/generate</code></li>
             <li><strong>Método HTTP:</strong> <code>POST</code></li>
             <li><strong>Descrição:</strong> Envia um texto (prompt) e recebe uma resposta gerada pela inteligência artificial.</li>
         </ul>
@@ -87,11 +87,11 @@
         <hr>
 
         <h2>💻 Mão na Massa: Exemplos de Código</h2>
-        <p>Veja como é fácil integrar a API em diferentes ambientes. Não se esqueça de substituir <code>SUA_URL_BASE/generate</code> pela URL real da sua API.</p>
+        <p>Veja como é fácil integrar a API em diferentes ambientes. Não se esqueça de substituir <code>https://ask-jetrom.vercel.app/generate</code> pela URL real da sua API.</p>
 
         <h3>cURL (Terminal)</h3>
         <p>Perfeito para fazer um teste rápido na linha de comando.</p>
-        <pre><code class="language-bash">curl -X POST "SUA_URL_BASE/generate" \
+        <pre><code class="language-bash">curl -X POST "https://ask-jetrom.vercel.app/generate" \
 -H "Content-Type: application/json" \
 -d '{
   "prompt": "Explique o que é uma API de forma simples e divertida."
@@ -102,7 +102,7 @@
         <pre><code class="language-python">import requests
 import json
 
-api_url = "SUA_URL_BASE/generate"
+api_url = "https://ask-jetrom.vercel.app/generate"
 headers = {
     'Content-Type': 'application/json'
 }
@@ -129,7 +129,7 @@ except requests.exceptions.RequestException as e:
         <h3>JavaScript (para Frontend)</h3>
         <p>Use a <code>Fetch API</code> para consumir a API diretamente de uma página web.</p>
         <pre><code class="language-javascript">async function callGuiaCuriosoAPI(promptText) {
-    const apiUrl = 'SUA_URL_BASE/generate'; // Substitua pela URL real da sua API
+    const apiUrl = 'https://ask-jetrom.vercel.app/generate'; // Substitua pela URL real da sua API
 
     try {
         const response = await fetch(apiUrl, {
