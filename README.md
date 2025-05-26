@@ -2,7 +2,7 @@
 
 E ai, Dev! 👋
 
-Preparado para integrar a API **Guia Curioso** e dar um upgrade no seu projeto com o poder do Gemini? Este tutorial vai te guiar passo a passo, de forma clara e direta. Vamos lá!
+Preparado para integrar a API **Jetrom** e dar um upgrade no seu projeto com o poder do Gemini? Este tutorial vai te guiar passo a passo, de forma clara e direta. Vamos lá!
 
 ---
 
@@ -19,7 +19,7 @@ A API foi criada para ser simples e intuitiva. Ela possui um único endpoint pri
 
 Este é o coração da API. É aqui que a mágica acontece.
 
-* **URL:** `[URL_BASE_DO_SEU_SERVIDOR]/generate`
+* **URL:** `https://ask-jetrom.vercel.app/generate`
 * **Método HTTP:** `POST`
 * **Descrição:** Envia um texto (prompt) e recebe uma resposta gerada pela inteligência artificial.
 
@@ -84,7 +84,7 @@ Veja como é fácil integrar a API em diferentes ambientes. Não se esqueça de 
 Perfeito para fazer um teste rápido na linha de comando.
 
 ```bash
-curl -X POST "SUA_URL_BASE/generate" \
+curl -X POST "https://ask-jetrom.vercel.app/generate" \
 -H "Content-Type: application/json" \
 -d '{
   "prompt": "Explique o que é uma API de forma simples e divertida."
@@ -99,7 +99,7 @@ Ideal para integrar em seus serviços ou scripts Python. Você precisará da bib
 import requests
 import json
 
-api_url = "SUA_URL_BASE/generate"
+api_url = "https://ask-jetrom.vercel.app/generate"
 headers = {
     'Content-Type': 'application/json'
 }
@@ -127,7 +127,7 @@ Use a `Workspace API` para consumir a API diretamente de uma página web.
 
 ```javascript
 async function callGuiaCuriosoAPI(promptText) {
-    const apiUrl = 'SUA_URL_BASE/generate';
+    const apiUrl = 'https://ask-jetrom.vercel.app/generate';
 
     try {
         const response = await fetch(apiUrl, {
@@ -157,4 +157,4 @@ async function callGuiaCuriosoAPI(promptText) {
 callGuiaCuriosoAPI("Qual a distância entre a Terra e a Lua em quilômetros?");
 ```
 
-E é isso! Agora você tem tudo o que precisa para começar a construir coisas incríveis com a API **Guia Curioso**. Boas implementações! ✨
+E é isso! Agora você tem tudo o que precisa para começar a construir coisas incríveis com a API **Jetrom**. Boas implementações! ✨
