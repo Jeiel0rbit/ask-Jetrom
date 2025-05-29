@@ -42,7 +42,7 @@ limiter = Limiter(
 @app.errorhandler(429)
 def ratelimit_handler(e):
     return Response(
-        json.dumps({"error": "Limite de requisições excedido. Por favor, tente novamente mais tarde."}, ensure_ascii=False, indent=4),
+        json.dumps({"error": "Suas consultas, chegaram ao fim. Tente novamente após 1 hora."}, ensure_ascii=False, indent=4),
         mimetype='application/json',
         status=429
     )
