@@ -1,12 +1,12 @@
 # Configurações iniciais e importações de bibliotecas.
 import os
 import google.generativeai as genai
-from flask import Flask, request, Response, render_template
+from flask import Flask, request, Response, render_template, jsonify # Importar jsonify para usar em erros
 import json
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_cors import cross_origin
+from flask_cors import CORS, cross_origin # Importar CORS também
 from werkzeug.exceptions import HTTPException
 
 # Carrega variáveis de ambiente do .env.
@@ -14,6 +14,11 @@ load_dotenv()
 
 # Inicializa a aplicação Flask.
 app = Flask(__name__)
+
+# --- NOVIDADE AQUI: Habilita CORS para toda a aplicação ---
+# Isso garante que os cabeçalhos CORS sejam adicionados a todas as respostas,
+# incluindo as de erro que não passam pelo decorator @cross_origin().
+CORS(app)
 
 # Configura o Flask-Limiter para controle de taxa de requisições.
 REDIS_URL = os.getenv("REDIS_URL")
@@ -41,11 +46,12 @@ limiter = Limiter(
 # Manipulador de erro para respostas 429 (Too Many Requests).
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    return Response(
-        json.dumps({"error": "Suas consultas, chegaram ao fim. Tente novamente após 1 hora."}, ensure_ascii=False, indent=4),
-        mimetype='application/json',
-        status=429
-    )
+    # Use jsonify para criar a resposta JSON e garantir os cabeçalhos corretos.
+    # CORS(app) já deveria adicionar os cabeçalhos, mas usar jsonify ajuda a garantir
+    # que o tipo de conteúdo e outros aspectos da resposta sejam configurados corretamente.
+    response = jsonify({"error": "Suas consultas, chegaram ao fim. Tente novamente após 1 hora."})
+    response.status_code = 429
+    return response
 
 # Configura a API Gemini com a chave de ambiente.
 try:
@@ -55,6 +61,9 @@ try:
     genai.configure(api_key=api_key)
 except ValueError as e:
     print(f"Erro ao configurar a API Key: {e}")
+    # Para uma aplicação de produção, você pode querer sair aqui se a API key for crítica
+    # import sys
+    # sys.exit(1)
     pass
 
 # Define o modelo Gemini e as instruções de sistema para a IA.
@@ -67,6 +76,8 @@ def home():
     return render_template('index.html', model_name=MODEL_NAME)
 
 # Rota para gerar texto com a API Gemini e aplicar limite de taxa.
+# O decorator @cross_origin() aqui se torna menos crítico se CORS(app) for usado,
+# mas não há problema em mantê-lo.
 @app.route('/generate', methods=['POST'])
 @cross_origin()
 @limiter.limit("10/hour")
@@ -74,22 +85,20 @@ def generate_text():
     # Valida a requisição JSON e o prompt do usuário.
     if not request.is_json:
         error_response_data = {"error": "A requisição deve ser do tipo JSON"}
-        json_error_response = json.dumps(error_response_data, ensure_ascii=False, indent=4)
-        return Response(json_error_response, mimetype='application/json', status=400)
+        # Use jsonify aqui também para consistência e para garantir cabeçalhos CORS
+        return jsonify(error_response_data), 400
 
     data = request.get_json()
     prompt_user = data.get('prompt')
 
     if not prompt_user:
         error_response_data = {"error": "O campo 'prompt' é obrigatório no JSON da requisição."}
-        json_error_response = json.dumps(error_response_data, ensure_ascii=False, indent=4)
-        return Response(json_error_response, mimetype='application/json', status=400)
+        return jsonify(error_response_data), 400
 
     # Verifica a configuração da API Key da Gemini.
     if not os.getenv("GOOGLE_API_KEY"):
         error_response_data = {"error": "A API Key para a API Gemini não está configurada no servidor."}
-        json_error_response = json.dumps(error_response_data, ensure_ascii=False, indent=4)
-        return Response(json_error_response, mimetype='application/json', status=500)
+        return jsonify(error_response_data), 500
 
     try:
         # Inicializa o modelo Gemini e gera conteúdo.
@@ -114,16 +123,14 @@ def generate_text():
 
         # Retorna a resposta gerada em formato JSON.
         response_data = {"generated_text": generated_text}
-        json_response = json.dumps(response_data, ensure_ascii=False, indent=4)
-
-        return Response(json_response, mimetype='application/json')
+        # Use jsonify para consistência e para garantir os cabeçalhos CORS
+        return jsonify(response_data)
 
     except Exception as e:
         # Trata erros durante a chamada à API Gemini.
         print(f"Erro ao chamar a API Gemini: {e}")
         error_response_data = {"error": "Ocorreu um erro ao processar sua solicitação com a API Gemini.", "details": str(e)}
-        json_error_response = json.dumps(error_response_data, ensure_ascii=False, indent=4)
-        return Response(json_error_response, mimetype='application/json', status=500)
+        return jsonify(error_response_data), 500
 
 # Bloco de execução principal para iniciar o servidor Flask.
 if __name__ == '__main__':
